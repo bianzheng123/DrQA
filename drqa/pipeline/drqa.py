@@ -24,7 +24,6 @@ from . import DEFAULTS
 
 logger = logging.getLogger(__name__)
 
-
 # ------------------------------------------------------------------------------
 # Multiprocessing functions to fetch and tokenize text
 # ------------------------------------------------------------------------------
@@ -193,6 +192,7 @@ class DrQA(object):
 
     def process_batch(self, queries, candidates=None, top_n=1, n_docs=5,
                       return_context=False):
+
         """Run a batch of queries (more efficient)."""
         t0 = time.time()
         logger.info('Processing %d queries...' % len(queries))
@@ -209,12 +209,21 @@ class DrQA(object):
 
         # Flatten document ids and retrieve text from database.
         # We remove duplicates for processing efficiency.
+        '''
+        flat_docids stores the document ID for all the retrieved documents
+        did2didx maps from the document ID to the local index in the flat_docids list
+        doc_texts is a list, stores the text of the document
+        '''
         flat_docids = list({d for docids in all_docids for d in docids})
         did2didx = {did: didx for didx, did in enumerate(flat_docids)}
         doc_texts = self.processes.map(fetch_text, flat_docids)
 
         # Split and flatten documents. Maintain a mapping from doc (index in
         # flat list) to split (index in flat list).
+        '''
+        flat_splits stores the splited text of the documents
+        didx2sidx is an 1d array, each elements stores the start and the end index of each split document
+        '''
         flat_splits = []
         didx2sidx = []
         for text in doc_texts:
@@ -232,6 +241,11 @@ class DrQA(object):
 
         # Group into structured example inputs. Examples' ids represent
         # mappings to their question, document, and split ids.
+        '''
+        examples stores the text of query-chunks pair, 
+        qidx is the queryID, rel_didx is the relative document ID in the all docidx[qidx], 
+        sidx is the split index in the flat_splits
+        '''
         examples = []
         for qidx in range(len(queries)):
             for rel_didx, did in enumerate(all_docids[qidx]):
@@ -263,18 +277,33 @@ class DrQA(object):
                         'input': s_tokens[ex_id[2]],
                         'cands': candidates[ex_id[0]] if candidates else None
                     })
+                # print("batch upper predict")
                 handle = self.reader.predict(
                     batch, batch_cands, async_pool=self.processes
                 )
             else:
-                handle = self.reader.predict(batch, async_pool=self.processes)
+                # print("batch lower predict")
+                # handle = self.reader.predict(batch, async_pool=self.processes)
+                # print(batch[0].shape)
+                # print(batch[1].shape)
+                handle = self.reader.predict(batch)
+            # print(batch)
+            # print(len(batch), batch[0].shape, batch[1].shape)
             result_handles.append((handle, batch[-1], batch[0].size(0)))
+
+        # print("can here")
 
         # Iterate through the predictions, and maintain priority queues for
         # top scored answers for each question in the batch.
         queues = [[] for _ in range(len(queries))]
         for result, ex_ids, batch_size in result_handles:
-            s, e, score = result.get()
+            # s, e, score = result.get()
+            s, e, score = result
+            # print("result")
+            # print(s)
+            # print(e)
+            # print(score)
+            # print(len(s), len(e), len(score), ex_ids, batch_size)
             for i in range(batch_size):
                 # We take the top prediction per split.
                 if len(score[i]) > 0:
@@ -284,6 +313,8 @@ class DrQA(object):
                         heapq.heappush(queue, item)
                     else:
                         heapq.heappushpop(queue, item)
+            # print(f"after batch_size {batch_size}")
+        # print("can here2")
 
         # Arrange final top prediction data.
         all_predictions = []

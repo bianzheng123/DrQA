@@ -315,6 +315,8 @@ class DocReader(object):
             top_n: number of top scored pairs to take
             max_len: max span length to consider
         """
+        # print(score_s, score_e)
+        # print("can within decode")
         pred_s = []
         pred_e = []
         pred_score = []

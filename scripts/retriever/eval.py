@@ -86,7 +86,7 @@ def get_score(answer_doc, match):
 # ------------------------------------------------------------------------------
 # Main
 # ------------------------------------------------------------------------------
-
+'''python3 scripts/retriever/eval.py ./data/datasets/CuratedTrec-test.txt  --match regex'''
 
 if __name__ == '__main__':
     logger = logging.getLogger()
@@ -151,12 +151,12 @@ if __name__ == '__main__':
 
     filename = os.path.basename(args.dataset)
     stats = (
-        "\n" + "-" * 50 + "\n" +
-        "{filename}\n" +
-        "Examples:\t\t\t{total}\n" +
-        "Matches in top {k}:\t\t{m}\n" +
-        "Match % in top {k}:\t\t{p:2.2f}\n" +
-        "Total time:\t\t\t{t:2.4f} (s)\n"
+            "\n" + "-" * 50 + "\n" +
+            "{filename}\n" +
+            "Examples:\t\t\t{total}\n" +
+            "Matches in top {k}:\t\t{m}\n" +
+            "Match % in top {k}:\t\t{p:2.2f}\n" +
+            "Total time:\t\t\t{t:2.4f} (s)\n"
     ).format(
         filename=filename,
         total=len(scores),

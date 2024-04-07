@@ -73,6 +73,8 @@ class Predictor(object):
         else:
             tokenizer_class = tokenizers.get_class(tokenizer)
 
+        # self.workers = None
+        # self.tokenizer = tokenizer_class(annotators=annotators)
         if num_workers is None or num_workers > 0:
             self.workers = ProcessPool(
                 num_workers,
@@ -99,13 +101,19 @@ class Predictor(object):
 
         # Tokenize the inputs, perhaps multi-processed.
         if self.workers:
+            print("workers: ", self.workers)
             q_tokens = self.workers.map_async(tokenize, questions)
             d_tokens = self.workers.map_async(tokenize, documents)
             q_tokens = list(q_tokens.get())
             d_tokens = list(d_tokens.get())
         else:
+            print("not workers")
             q_tokens = list(map(self.tokenizer.tokenize, questions))
             d_tokens = list(map(self.tokenizer.tokenize, documents))
+        # print("not workers")
+        # q_tokens = list(map(self.tokenizer.tokenize, questions))
+        # d_tokens = list(map(self.tokenizer.tokenize, documents))
+        print("q_tokens: ", q_tokens)
 
         examples = []
         for i in range(len(questions)):
@@ -118,6 +126,7 @@ class Predictor(object):
                 'pos': d_tokens[i].pos(),
                 'ner': d_tokens[i].entities(),
             })
+        print("examples: ", examples)
 
         # Stick document tokens in candidates for decoding
         if candidates:

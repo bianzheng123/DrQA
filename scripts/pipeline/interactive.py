@@ -77,9 +77,11 @@ DrQA = pipeline.DrQA(
 
 
 def process(question, candidates=None, top_n=1, n_docs=5):
+    print("before process")
     predictions = DrQA.process(
         question, candidates, top_n, n_docs, return_context=True
     )
+    print("after process")
     table = prettytable.PrettyTable(
         ['Rank', 'Answer', 'Doc', 'Answer Score', 'Doc Score']
     )
@@ -111,5 +113,6 @@ Interactive DrQA
 def usage():
     print(banner)
 
-
-code.interact(banner=banner, local=locals())
+# print(locals())
+# code.interact(banner=banner, local=locals())
+process('What is question answering?', top_n=1, n_docs=5)

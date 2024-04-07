@@ -31,7 +31,7 @@ parser.add_argument('--model', type=str, default=None,
 parser.add_argument('--embedding-file', type=str, default=None,
                     help=('Expand dictionary to use all pretrained '
                           'embeddings in this file.'))
-parser.add_argument('--out-dir', type=str, default='/tmp',
+parser.add_argument('--out-dir', type=str, default='./result/',
                     help=('Directory to write prediction file to '
                           '(<dataset>-<model>.preds)'))
 parser.add_argument('--tokenizer', type=str, default=None,
@@ -72,7 +72,6 @@ if args.cuda:
 # ------------------------------------------------------------------------------
 # Read in dataset and make predictions.
 # ------------------------------------------------------------------------------
-
 
 examples = []
 qids = []
