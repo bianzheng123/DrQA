@@ -1,1 +1,3 @@
 python3 scripts/pipeline/predict.py data/datasets/SQuAD-v1.1-dev.txt --out-dir ./result/ --tokenizer regexp
+
+python3 scripts/pipeline/eval.py data/datasets/SQuAD-v1.1-dev.txt result/SQuAD-v1.1-dev-default-pipeline.preds
