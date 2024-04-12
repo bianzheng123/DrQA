@@ -31,7 +31,7 @@ def evaluate(dataset_file, prediction_file, regex=False):
     with open(prediction_file) as f:
         for line in f:
             data = json.loads(line)
-            prediction = normalize(data[0]['span'])
+            prediction = '' if len(data) == 0 else normalize(data[0]['span'])
             predictions.append(prediction)
 
     exact_match = 0

@@ -1,3 +1,22 @@
-python3 scripts/pipeline/predict.py data/datasets/SQuAD-v1.1-dev.txt --out-dir ./result/ --tokenizer regexp
+Need to change two things: --doc-db and --retriever-model
+
+python3 scripts/pipeline/predict.py data/datasets/SQuAD-v1.1-dev.txt \
+        --doc-db data/db/wikipedia-500.db --retriever-model data/db/wikipedia-500-tfidf-ngram=2-hash=16777216-tokenizer=simple.npz \
+        --out-dir ./result/ --tokenizer regexp --n-docs 10 --top-n 1 --reader-model data/reader/multitask.mdl --num-workers 1
+
+python3 scripts/pipeline/eval.py data/datasets/SQuAD-v1.1-dev.txt result/SQuAD-v1.1-dev-multitask-pipeline.preds
+
+
+python3 scripts/pipeline/predict.py data/datasets/SQuAD-v1.1-dev.txt --out-dir ./result/ --tokenizer regexp --n-docs 1
 
 python3 scripts/pipeline/eval.py data/datasets/SQuAD-v1.1-dev.txt result/SQuAD-v1.1-dev-default-pipeline.preds
+
+
+To build the db file:
+
+preprocess the wikipedia data
+
+python3 scripts/retriever/build_db.py ./data/raw_data/wikipedia-500.jsonl ./data/db/wikipedia-500.db
+
+python3 scripts/retriever/build_tfidf.py ./data/db/wikipedia-500.db ./data/db/
+
